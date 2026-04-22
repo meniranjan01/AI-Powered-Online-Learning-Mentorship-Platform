@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git config * user.email \"metkar.niranjan2004@gmail.com\")"
+      "Bash(git config * user.email \"metkar.niranjan2004@gmail.com\")",
+      "Bash(npm install *)",
+      "Read(//D:/internship demo/**)",
+      "Bash(cat)",
+      "Bash(node *)",
+      "Bash(npm test *)",
+      "Bash(git add *)"
     ]
   }
 }
