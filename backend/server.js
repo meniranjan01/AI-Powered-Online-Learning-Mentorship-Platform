@@ -6,6 +6,9 @@ const usersRoute = require('./routes/users');
 const coursesRoute = require('./routes/courses');
 const authRoute = require('./routes/auth');
 const learningGoalsRoute = require('./routes/learningGoals');
+const userCourseRoute = require('./routes/userCourse');
+const recommendationsRoute = require('./routes/recommendations');
+const analyticsRoute = require('./routes/analytics');
 
 // Load environment variables
 dotenv.config();
@@ -52,6 +55,15 @@ app.use('/api/courses', coursesRoute);
 
 // Learning goals routes
 app.use('/api/learning-goals', learningGoalsRoute);
+
+// User course routes
+app.use('/api/user-courses', userCourseRoute);
+
+// Recommendations routes
+app.use('/api/recommendations', recommendationsRoute);
+
+// Analytics routes
+app.use('/api/analytics', analyticsRoute);
 
 // Start server
 app.listen(PORT, () => {

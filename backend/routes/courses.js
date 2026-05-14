@@ -1,36 +1,96 @@
 const express = require('express');
 const router = express.Router();
-
-// Mock course data
-let courses = [
-  { id: 1, title: 'Introduction to AI', description: 'Learn the basics of Artificial Intelligence', instructor: 'Dr. AI Expert', duration: '4 weeks' },
-  { id: 2, title: 'Web Development Fundamentals', description: 'HTML, CSS, and JavaScript for beginners', instructor: 'Web Dev Master', duration: '6 weeks' }
-];
+const { Course } = require('../models');
 
 // Get all courses
-router.get('/', (req, res) => {
-  res.json(courses);
+router.get('/', async (req, res) => {
+  try {
+    const courses = await Course.findAll();
+    res.json(courses);
+  } catch (error) {
+    console.error('Get courses error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 // Get course by ID
-router.get('/:id', (req, res) => {
-  const course = courses.find(c => c.id === parseInt(req.params.id));
-  if (!course) return res.status(404).json({ message: 'Course not found' });
-  res.json(course);
+router.get('/:id', async (req, res) => {
+  try {
+    const course = await Course.findByPk(req.params.id);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    res.json(course);
+  } catch (error) {
+    console.error('Get course error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 // Create new course
-router.post('/', (req, res) => {
-  const { title, description, instructor, duration } = req.body;
-  const newCourse = {
-    id: courses.length + 1,
-    title,
-    description,
-    instructor,
-    duration
-  };
-  courses.push(newCourse);
-  res.status(201).json(newCourse);
+router.post('/', async (req, res) => {
+  try {
+    const { title, description, instructor, duration } = req.body;
+
+    // Validate input
+    if (!title || !description || !instructor || !duration) {
+      return res.status(400).json({ message: 'Title, description, instructor, and duration are required' });
+    }
+
+    // Create course
+    const course = await Course.create({
+      title,
+      description,
+      instructor,
+      duration
+    });
+
+    res.status(201).json(course);
+  } catch (error) {
+    console.error('Create course error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update course
+router.put('/:id', async (req, res) => {
+  try {
+    const { title, description, instructor, duration } = req.body;
+    const course = await Course.findByPk(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // Update fields if provided
+    if (title !== undefined) course.title = title;
+    if (description !== undefined) course.description = description;
+    if (instructor !== undefined) course.instructor = instructor;
+    if (duration !== undefined) course.duration = duration;
+
+    await course.save();
+    res.json({ message: 'Course updated successfully', course });
+  } catch (error) {
+    console.error('Update course error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete course
+router.delete('/:id', async (req, res) => {
+  try {
+    const course = await Course.findByPk(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    await course.destroy();
+    res.json({ message: 'Course deleted successfully' });
+  } catch (error) {
+    console.error('Delete course error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 module.exports = router;
